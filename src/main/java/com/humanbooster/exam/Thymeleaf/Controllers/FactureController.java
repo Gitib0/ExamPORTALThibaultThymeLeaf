@@ -1,6 +1,7 @@
 package com.humanbooster.exam.Thymeleaf.Controllers;
 
 import com.humanbooster.exam.Thymeleaf.Models.Facture;
+import com.humanbooster.exam.Thymeleaf.Repository.FactureRepository;
 import com.humanbooster.exam.Thymeleaf.Services.PdfService;
 import com.itextpdf.text.DocumentException;
 import jakarta.servlet.http.HttpServletResponse;
@@ -17,6 +18,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 
 @Controller
@@ -25,9 +27,16 @@ public class FactureController {
     @Autowired
     PdfService pdfService;
 
+    @Autowired
+    FactureRepository factureRepository;
+
     @RequestMapping("")
     public ModelAndView home(){
         ModelAndView mv = new ModelAndView("home");
+
+        List<Facture> factures = factureRepository.findAll();
+
+        mv.addObject("factures", factures);
 
         return  mv;
     }
