@@ -1,24 +1,28 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="fr">
 <head>
-    <meta charset="UTF-8"> </meta>
+    <meta charset="UTF-8"></meta>
     <title>Facture</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
         }
+
         table {
             width: 100%;
             border-collapse: collapse;
         }
+
         th, td {
             border: 1px solid #dddddd;
             text-align: left;
             padding: 8px;
         }
+
         th {
             background-color: #f2f2f2;
         }
+
         .text-right {
             text-align: right;
         }
@@ -38,25 +42,25 @@
     </tr>
     </thead>
     <tbody>
-    <tr th:each="ligne : ${facture.lignes}">
+    <tr th:each="ligne, iterStat : ${facture.lignes}">
         <td th:text="${ligne.designation}"></td>
         <td th:text="${ligne.quantity}"></td>
         <td th:text="${ligne.prixHt}"></td>
         <td th:text="${ligne.tva?.libelle}"></td>
-        <td th:text="${ligne.prixHt.multiply(ligne.quantity)}"></td>
-        <td th:text="${ligne.prixHt.multiply(ligne.quantity).multiply(1 + (ligne.tva != null ? ligne.tva.taux / 100 : 0))}"></td>
+        <td th:text="${formattedLigneTotalHTList[iterStat.index]}"></td>
+        <td th:text="${formattedLigneTotalTTCList[iterStat.index]}"></td>
     </tr>
     </tbody>
     <tfoot>
     <tr>
         <td colspan="4" class="text-right"><strong>Total HT :</strong></td>
-        <td th:utext="${formattedTotalHT}"></td>
+        <td th:text="${formattedTotalHT}"></td>
         <td></td>
     </tr>
     <tr>
         <td colspan="4" class="text-right"><strong>Total TTC :</strong></td>
         <td></td>
-        <td th:utext="${formattedTotalTTC}"></td>
+        <td th:text="${formattedTotalTTC}"></td>
     </tr>
     </tfoot>
 </table>

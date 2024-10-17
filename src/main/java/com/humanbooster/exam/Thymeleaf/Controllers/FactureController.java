@@ -19,7 +19,9 @@ import java.io.*;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 @Controller
@@ -32,14 +34,14 @@ public class FactureController {
     FactureRepository factureRepository;
 
     @RequestMapping("")
-    public ModelAndView home(){
+    public ModelAndView home() {
         ModelAndView mv = new ModelAndView("home");
 
         List<Facture> factures = factureRepository.findAll();
 
         mv.addObject("factures", factures);
 
-        return  mv;
+        return mv;
     }
 
     @RequestMapping("detail/{facture}")
@@ -50,28 +52,36 @@ public class FactureController {
 
         ModelAndView mv = new ModelAndView("detail");
         mv.addObject("facture", facture);
-        calculateAndFormatTotals(facture, mv);
+
+        Map<String, Object> totals = calculateAndFormatTotals(facture);
+        mv.addObject("formattedTotalHT", totals.get("formattedTotalHT"));
+        mv.addObject("formattedTotalTTC", totals.get("formattedTotalTTC"));
+        mv.addObject("formattedLigneTotalHTList", totals.get("formattedLigneTotalHTList"));
+        mv.addObject("formattedLigneTotalTTCList", totals.get("formattedLigneTotalTTCList"));
 
         return mv;
     }
 
     @RequestMapping("pdf/{facture}")
     public void pdf(@PathVariable(required = false) Facture facture, HttpServletResponse httpServletResponse) throws DocumentException, IOException {
-
         if (facture == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Facture inexistante");
         }
 
         ModelAndView mv = new ModelAndView("pdf/facture");
         mv.addObject("facture", facture);
-        calculateAndFormatTotals(facture, mv);
 
-        this.pdfService.generatePdfFromHtml(facture);
+        Map<String, Object> totals = calculateAndFormatTotals(facture);
+        String formattedTotalHT = (String) totals.get("formattedTotalHT");
+        String formattedTotalTTC = (String) totals.get("formattedTotalTTC");
+        List<String> formattedLigneTotalHTList = (List<String>) totals.get("formattedLigneTotalHTList");
+        List<String> formattedLigneTotalTTCList = (List<String>) totals.get("formattedLigneTotalTTCList");
 
-        InputStream inputStream = new FileInputStream(
-                new File("src/main/resources/static/pdf/facture.pdf")
-        );
+        // Passer les totaux au service PDF
+        this.pdfService.generatePdfFromHtml(facture, formattedTotalHT, formattedTotalTTC, formattedLigneTotalHTList, formattedLigneTotalTTCList);
 
+        // Gérer le téléchargement du PDF
+        InputStream inputStream = new FileInputStream(new File("src/main/resources/static/pdf/facture.pdf"));
         IOUtils.copy(inputStream, httpServletResponse.getOutputStream());
 
         String headerValue = "attachment; filename=" + facture.getLibelle() + ".pdf";
@@ -82,7 +92,7 @@ public class FactureController {
     }
 
 
-    private void calculateAndFormatTotals(Facture facture, ModelAndView mv) {
+    private Map<String, Object> calculateAndFormatTotals(Facture facture) {
         double totalHT = 0.0;
         double totalTTC = 0.0;
 
@@ -93,7 +103,7 @@ public class FactureController {
 
         for (LigneFacture ligne : facture.getLignes()) {
             double ligneTotalHT = ligne.getPrixHt().doubleValue() * ligne.getQuantity().doubleValue();
-            double tvaAmount = ligne.getTva() != null ? (ligne.getTva().getTaux() / 100.0) * ligneTotalHT : 0.0;
+            double tvaAmount = ligne.getTva() != null ? (ligne.getTva().getTaux() * ligneTotalHT) : 0.0;
 
             totalHT += ligneTotalHT;
             totalTTC += ligneTotalHT + tvaAmount;
@@ -102,10 +112,12 @@ public class FactureController {
             formattedLigneTotalTTCList.add(df.format(ligneTotalHT + tvaAmount));
         }
 
-        mv.addObject("formattedLigneTotalHTList", formattedLigneTotalHTList);
-        mv.addObject("formattedLigneTotalTTCList", formattedLigneTotalTTCList);
+        Map<String, Object> totals = new HashMap<>();
+        totals.put("formattedTotalHT", df.format(totalHT));
+        totals.put("formattedTotalTTC", df.format(totalTTC));
+        totals.put("formattedLigneTotalHTList", formattedLigneTotalHTList);
+        totals.put("formattedLigneTotalTTCList", formattedLigneTotalTTCList);
 
-        mv.addObject("formattedTotalHT", df.format(totalHT));
-        mv.addObject("formattedTotalTTC", df.format(totalTTC));
+        return totals;
     }
 }

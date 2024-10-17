@@ -51,10 +51,10 @@
             </thead>
             <tbody>
             <tr th:each="ligne, iterStat : ${facture.lignes}">
-                <td th:text="${ligne.quantity}"></td>
                 <td th:text="${ligne.designation}"></td>
+                <td th:text="${ligne.quantity}"></td>
                 <td th:text="${ligne.prixHt}"></td>
-                <td th:text="${ligne.tva?.libelle}"></td>
+                <td th:text="${ligne.tva != null ? ligne.tva.taux * 100 : 'N/A'} + '%'"></td>
                 <td th:text="${formattedLigneTotalHTList[iterStat.index]}"></td>
                 <td th:text="${formattedLigneTotalTTCList[iterStat.index]}"></td>
             </tr>
