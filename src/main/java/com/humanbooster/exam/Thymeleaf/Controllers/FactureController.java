@@ -16,7 +16,6 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.io.*;
-import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -77,10 +76,8 @@ public class FactureController {
         List<String> formattedLigneTotalHTList = (List<String>) totals.get("formattedLigneTotalHTList");
         List<String> formattedLigneTotalTTCList = (List<String>) totals.get("formattedLigneTotalTTCList");
 
-        // Passer les totaux au service PDF
         this.pdfService.generatePdfFromHtml(facture, formattedTotalHT, formattedTotalTTC, formattedLigneTotalHTList, formattedLigneTotalTTCList);
 
-        // Gérer le téléchargement du PDF
         InputStream inputStream = new FileInputStream(new File("src/main/resources/static/pdf/facture.pdf"));
         IOUtils.copy(inputStream, httpServletResponse.getOutputStream());
 
