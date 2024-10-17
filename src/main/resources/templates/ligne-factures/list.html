@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Liste des Lignes de Facture</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+<body>
+<header th:include="components/fragments::header"></header>
+
+<div class="container mt-5" id="facture-lignes-container">
+    <div class="d-flex justify-content-between mb-3">
+        <h1 id="facture-title">Liste des Lignes de Facture</h1>
+        <div id="facture-buttons">
+            <a th:href="@{/detail/{facture}(facture=${facture.id})}" class="btn btn-secondary">Retour</a>
+            <a th:href="@{/ligne/{facture}/ajout(facture=${facture.id})}" class="btn btn-primary">Ajouter une ligne</a>
+        </div>
+    </div>
+    <table class="table table-bordered table-striped" id="facture-lignes-table">
+        <thead>
+        <tr>
+            <th>ID du produit</th>
+            <th>Quantité</th>
+            <th>Description</th>
+            <th>Prix unitaire HT</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="ligne : ${facture.lignes}">
+            <td th:text="${ligne.id}"></td>
+            <td th:text="${ligne.quantity}"></td>
+            <td th:text="${ligne.designation}"></td>
+            <td th:text="${ligne.prixHt} + ' €'"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<div th:insert="components/fragments :: footer"></div>
+<script type="text/javascript" th:src="@{/js/bootstrap.min.js}"></script>
+</body>
+</html>

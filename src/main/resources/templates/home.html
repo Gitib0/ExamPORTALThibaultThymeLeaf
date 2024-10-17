@@ -1,0 +1,40 @@
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Home</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+<body>
+<header th:include="components/fragments::header"></header>
+
+<div class="container">
+    <div th:if="${factures.isEmpty()}" class="w-100 text-danger text-center">
+        Il n'y pas de facture dans la base de données
+    </div>
+    <div class="container my-5">
+        <div class="row">
+            <div class="col-md-4 mb-4" th:each="facture : ${factures}">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h5 th:utext="${facture.emeteur.raisonSociale}">Nom du client</h5>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Émetteur : </strong><span th:text="${facture.emeteur.raisonSociale}">Emetteur</span></p>
+                        <p><strong>Date de la facture : </strong><span th:utext="${#dates.format(facture.dateFacture, 'dd/MM/yyyy')}">Date de la facture</span>
+                        </p>
+                        <p><strong>Date de règlement : </strong><span
+                                th:utext="${#dates.format(facture.datePayment, 'dd/MM/yyyy')}">Date de règlement</span></p>
+                    </div>
+                    <div class="card-footer text-right">
+                        <a th:href="@{/detail/{facture}(facture=${facture.id})}" class="btn btn-primary">Voir les détails</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:insert="components/fragments :: footer"></div>
+<script type="text/javascript" th:src="@{/js/bootstrap.min.js}"></script>
+</body>
+</html>

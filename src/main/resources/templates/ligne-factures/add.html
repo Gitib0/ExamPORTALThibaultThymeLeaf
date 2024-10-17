@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Ajouter une Ligne</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+<body>
+<header th:include="components/fragments::header"></header>
+
+
+<div class="container form-container">
+    <h2>Ajouter une Ligne</h2>
+
+    <div class="d-flex justify-content-between">
+        <a th:href="@{/ligne/{facture}(facture=${ligneFacture.facture.id})}" class="btn btn-secondary">Retour</a>
+    </div>
+
+    <form th:object="${ligneFacture}" method="post">
+        <div class="form-group">
+            <label for="prixHt">Prix HT</label>
+            <input type="text" id="prixHt" name="prixHt" th:field="*{prixHt}" class="form-control" required>
+        </div>
+
+        <div class="form-group">
+            <label for="quantity">Quantité</label>
+            <input type="number" id="quantity" name="quantity" th:field="*{quantity}" class="form-control" required>
+        </div>
+
+        <div class="form-group">
+            <label for="tva">TVA</label>
+            <select id="tva" name="tva" th:field="*{tva}" class="form-control" required>
+                <option value="" disabled selected>Sélectionnez une TVA</option>
+                <option th:each="tva : ${tvas}" th:value="${tva.id}" th:text="${tva.libelle}"></option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="designation">Désignation</label>
+            <textarea id="designation" name="designation" th:field="*{designation}" class="form-control" required></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary float-right">Enregistrer</button>
+    </form>
+</div>
+
+
+
+<div th:insert="components/fragments :: footer"></div>
+<script type="text/javascript" th:src="@{/js/bootstrap.min.js}"></script>
+</body>
+</html>

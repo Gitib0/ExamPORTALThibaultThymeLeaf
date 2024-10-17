@@ -1,0 +1,88 @@
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Détail de la Facture</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+<body>
+<header th:include="components/fragments::header"></header>
+<div class="container my-5">
+    <div class="d-flex justify-content-end mb-3">
+        <a th:href="@{/ligne/{facture}(facture=${facture.id})}" class="btn btn-primary mr-2">Voir les lignes</a>
+        <a th:href="@{/pdf/{facture}(facture=${facture.id})}" class="btn btn-success">Export as PDF</a>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="border p-3">
+                <h5>Émetteur</h5>
+                <p><strong>SIRET :</strong> <span th:text="${facture.emeteur.siret}">12345678901234</span></p>
+                <p><strong>Adresse :</strong> <span th:text="${facture.emeteur.numeroRue}">123 Rue de l'Emetteur</span>
+                </p>
+                <p><strong>Code postal / Ville :</strong> <span th:text="${facture.emeteur.codePostal}">75000</span>
+                    <span th:text="${facture.emeteur.ville}">Paris</span></p>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="border p-3">
+                <h5>Destinataire</h5>
+                <p><strong>SIRET :</strong> <span th:text="${facture.client.siret}">98765432109876</span></p>
+                <p><strong>Adresse :</strong> <span th:text="${facture.client.numeroRue}">456 Rue du Destinataire</span>
+                </p>
+                <p><strong>Code postal / Ville :</strong> <span th:text="${facture.client.codePostal}">69000</span>
+                    <span th:text="${facture.client.ville}">Lyon</span></p>
+            </div>
+        </div>
+    </div>
+
+    <div class="table-responsive my-4">
+        <table class="table table-bordered">
+            <thead class="thead-light">
+            <tr>
+                <th>Quantité</th>
+                <th>Description</th>
+                <th>Prix unitaire HT</th>
+                <th>TVA (%)</th>
+                <th>Total HT</th>
+                <th>Total TTC</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="ligne, iterStat : ${facture.lignes}">
+                <td th:text="${ligne.quantity}"></td>
+                <td th:text="${ligne.designation}"></td>
+                <td th:text="${ligne.prixHt}"></td>
+                <td th:text="${ligne.tva?.libelle}"></td>
+                <td th:text="${formattedLigneTotalHTList[iterStat.index]}"></td>
+                <td th:text="${formattedLigneTotalTTCList[iterStat.index]}"></td>
+            </tr>
+            </tbody>
+            <tfoot>
+            <tr>
+                <td colspan="4" class="text-right"><strong>Total HT :</strong></td>
+                <td th:text="${formattedTotalHT}"></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td colspan="4" class="text-right"><strong>Total TTC :</strong></td>
+                <td></td>
+                <td th:text="${formattedTotalTTC}"></td>
+            </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    <div class="border p-3">
+        <p>Règlement par virement bancaire au plus tard (aujourd'hui + 90 jours)</p>
+        <p>Tout retard de paiement d'une quelconque facture fait courir, immédiatement et de plein droit, des intérêts
+            de retard calculés au taux directeur de la BCE majoré de 7 points jusqu'au paiement effectif et
+            intégral.</p>
+    </div>
+
+</div>
+<div th:insert="components/fragments :: footer"></div>
+<script type="text/javascript" th:src="@{/js/bootstrap.min.js}"></script>
+</body>
+</html>
